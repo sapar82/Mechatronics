@@ -1,6 +1,13 @@
 #include <Arduino.h>
+
 // Temperature and humidity sensor
 #include <dht_nonblocking.h>
+//Initialize humidity and temperature values, create sensor object
+public float temperature; 
+public float humidity; 
+DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_TYPE_11 );
+
+
 // SD card
 #include <SPI.h>
 #include <SD.h>
@@ -17,5 +24,8 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // will read temperature and humidity values
+  dht_sensor.measure(temperature, humidity);
+
+  
 }
