@@ -24,12 +24,8 @@ String date;
 // Define pins
 int DistanceSensorTriggerPin = 3;
 int DHT_SENSOR_PIN = 2;
-int HumiditySensorPin = 4;
 int SDcardPin = 10;
 
-
-#define DHT_SENSOR_TYPE DHT_TYPE_11
-DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
 
 File myFile;
 
