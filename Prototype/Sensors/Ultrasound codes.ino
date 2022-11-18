@@ -17,7 +17,6 @@ void setup() {
 
 void loop() {
   dist=sr04.Distance();
-  bool state = false;
   if (dist < thresold){
     if (state == false){
       counter++;
