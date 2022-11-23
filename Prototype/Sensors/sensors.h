@@ -20,8 +20,8 @@ class LCD_screen {
     D6 = D6;
     D7 = D7;
   }
-  LiquidCrystal lcd(int RS,int E,int D4,int D5,int D6, int D7)
-}
+  LiquidCrystal lcd(int RS,int E,int D4,int D5,int D6, int D7);
+
 
   void setup{
     // initialize the library by associating any needed LCD interface pin
@@ -126,4 +126,3 @@ class DHT_sensor {
     dht = DHT_nonblocking(DHTPIN, DHTTYPE);
     }
   }
-}
