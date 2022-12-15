@@ -19,6 +19,8 @@ bool someone_was_there = false;
 bool someone_was_there_2 = false;
 const int distance_treshold = 30;
 int counter = 0;
+unsigned long time_counter_plus;
+unsigned long time_counter_minus;
 
 int TRIG_PIN_2 = 3;
 int ECHO_PIN_2 = 4;
@@ -35,7 +37,7 @@ SR04 sr04_2 = SR04(ECHO_PIN_2,TRIG_PIN_2);
 unsigned char image[1024];
 Paint paint(image, 0, 0);    // width should be the multiple of 8 
 Epd epd;
-unsigned long time_start_ms;
+unsigned long current_time;
 unsigned long time_now_s;
 
 //Real time clock
@@ -104,7 +106,7 @@ void init_screen()
   epd.SetFrameMemory_Base(IMAGE_DATA);
   epd.DisplayFrame();
 
-  time_start_ms = millis();      
+  current_time = millis();      
 }
 
 void loop_screen(String time, String counter, String temperature, String humidity) {
@@ -122,7 +124,7 @@ void loop_screen(String time, String counter, String temperature, String humidit
   paint.DrawStringAt(0, 4, time_string, &Font16, COLORED);
   epd.SetFrameMemory_Partial(paint.GetImage(), 100, 00, paint.GetWidth(), paint.GetHeight());
   
-  char temp_string[] = {'T', 'e', 'm', 'p', 'e', 'r', 'a', 't', 'u', 'r', 'e', ':', ' ', '-', '-', '.', '-', 'C', '\0'};
+  char temp_string[] = {'T', 'e', 'm', 'p', 'e', 'r', 'a', 't', 'u', 'r', 'e', ':', ' ', '-', '-', '.', '-', 'F', '\0'};
 
   temp_string[13] = temperature[0];
   temp_string[14] = temperature[1];
@@ -171,7 +173,6 @@ void loop_screen(String time, String counter, String temperature, String humidit
   // delay(300);
 }
 
-
 void setup() {
   Serial.begin(9600);
   Serial.println("Starting...");
@@ -181,19 +182,22 @@ void setup() {
   Serial.print("Time: ");
   Serial.println(__TIME__);
   initialization_sd();
-  Serial.print("Setup completed");
-  delay(1000);
+  delay(200);
   init_screen();
+  Serial.print("Setup completed");
 }
 
 void loop() {
   distance = sr04.Distance();
+
+  current_time = millis();
   if (distance < distance_treshold){
-    if (!someone_was_there){
+    if (!someone_was_there && ((current_time - time_counter_plus) > 2000)){
       counter++;
+
       Serial.print("Someone entered the room. Distance: ");
       Serial.println(distance);
-      delay(1000);
+      time_counter_plus = millis();
     }
     someone_was_there = true;
   }
@@ -202,11 +206,13 @@ void loop() {
   }
   distance = sr04_2.Distance();
   if (distance < distance_treshold){
-    if (!someone_was_there_2){
+    if (!someone_was_there_2 && ((current_time - time_counter_minus) > 2000)){
       counter--;
       Serial.print("Someone left the room. Distance: ");
       Serial.println(distance);
-      delay(1000);
+      Serial.println(someone_was_there_2);
+      Serial.println(!someone_was_there_2 && ((current_time - time_counter_minus) > 2000));
+      time_counter_minus = millis();
     }
     someone_was_there = true;
   }
@@ -234,7 +240,7 @@ void loop() {
     Serial.println(date + String(",") + time + String(",") + String(temperature) + String(",") + String(humidity) + String(",") + String(counter));
   }
   String counter_string = String(counter/1000) + String(counter/100 % 10) + String(counter/10 % 10) + String(counter % 10);
-  if (dt.second % 5 == 0){
+  if (dt.second % 20 == 0){
     loop_screen(String(time), String(counter), String(temperature), String(humidity));
   }
   
