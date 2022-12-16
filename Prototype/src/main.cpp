@@ -13,18 +13,20 @@ float humidity;
 #include "SR04.h"
 int TRIG_PIN = 5;
 int ECHO_PIN = 6;
-SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN);
-int distance;
-bool someone_was_there = false;
-bool someone_was_there_2 = false;
-const int distance_treshold = 30;
-int counter = 0;
-unsigned long time_counter_plus;
-unsigned long time_counter_minus;
+SR04 dist_sensor_in = SR04(ECHO_PIN,TRIG_PIN);
+
 
 int TRIG_PIN_2 = 3;
 int ECHO_PIN_2 = 4;
-SR04 sr04_2 = SR04(ECHO_PIN_2,TRIG_PIN_2);
+SR04 dist_sensor_out = SR04(ECHO_PIN_2,TRIG_PIN_2);
+
+int distance;
+int counter = 0;
+bool previous_state_in = false;
+bool previous_state_out = false;
+const int distance_treshold = 30;
+unsigned long time_counter_plus;
+unsigned long time_counter_minus;
 
 // Display
 #include <epd2in9_V2.h>
@@ -65,16 +67,18 @@ void initialization_sd(){
 
   if (!SD.begin(53)) {
     Serial.println("initialization failed!");
+    // Verify the SD card is present and can be initialized.
     while (1);
   }
   Serial.println("initialization done.");
 
-  if (SD.exists("data.txt")) {
+  if (SD.exists("data.txt")) { // if the file exists, append data to it: 
+  //TODO change this so we can hardcode the filename as a constant
     Serial.println("data.txt exists. Appending data.");
   } else {
     Serial.println("data.txt doesn't exist. Creating a new file.");
     myFile = SD.open("data.txt", FILE_WRITE);
-    myFile.println("Date,Time, Temperature,Humidity,Number of people");
+    myFile.println("Date, Time, Temperature, Humidity, Number of people");
     myFile.close();
   }
 }
@@ -188,36 +192,32 @@ void setup() {
 }
 
 void loop() {
-  distance = sr04.Distance();
+  distance = dist_sensor_in.Distance();
 
   current_time = millis();
   if (distance < distance_treshold){
-    if (!someone_was_there && ((current_time - time_counter_plus) > 2000)){
+    if (!previous_state_in && ((current_time - time_counter_plus) > 2000)){
       counter++;
 
       Serial.print("Someone entered the room. Distance: ");
       Serial.println(distance);
       time_counter_plus = millis();
     }
-    someone_was_there = true;
+    previous_state_in = true;
   }
   else{
-    someone_was_there = false;
+    previous_state_in = false;
   }
-  distance = sr04_2.Distance();
+  distance = dist_sensor_out.Distance();
   if (distance < distance_treshold){
-    if (!someone_was_there_2 && ((current_time - time_counter_minus) > 2000)){
+    if (!previous_state_out && ((current_time - time_counter_minus) > 2000)){
       counter--;
-      Serial.print("Someone left the room. Distance: ");
-      Serial.println(distance);
-      Serial.println(someone_was_there_2);
-      Serial.println(!someone_was_there_2 && ((current_time - time_counter_minus) > 2000));
       time_counter_minus = millis();
     }
-    someone_was_there = true;
+    previous_state_in = true;
   }
   else{
-    someone_was_there = false;
+    previous_state_in = false;
   }
 
   dt = clock.getDateTime();
