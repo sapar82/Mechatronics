@@ -221,7 +221,7 @@ void loop() {
   }
 
   dt = clock.getDateTime();
-  if ( dt.second % 30 == 0)
+  if ( dt.second % 315 == 0 )
   {
     Serial.println("Reading sensor");
     // Get time
@@ -240,8 +240,6 @@ void loop() {
     Serial.println(date + String(",") + time + String(",") + String(temperature) + String(",") + String(humidity) + String(",") + String(counter));
   }
   String counter_string = String(counter/1000) + String(counter/100 % 10) + String(counter/10 % 10) + String(counter % 10);
-  if (dt.second % 20 == 0){
     loop_screen(String(time), String(counter), String(temperature), String(humidity));
-  }
-  
+  delay(1000);
 }
