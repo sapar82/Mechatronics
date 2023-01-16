@@ -192,15 +192,15 @@ void setup() {
 }
 
 void loop() {
-  distance = dist_sensor_in.Distance();
+  distance_in = dist_sensor_in.Distance();
 
   current_time = millis();
-  if (distance < distance_treshold){
+  if (distance_in < distance_treshold){
     if (!previous_state_in && ((current_time - time_counter_plus) > 2000)){
       counter++;
 
       Serial.print("Someone entered the room. Distance: ");
-      Serial.println(distance);
+      Serial.println(distance_in);
       time_counter_plus = millis();
     }
     previous_state_in = true;
@@ -208,16 +208,16 @@ void loop() {
   else{
     previous_state_in = false;
   }
-  distance = dist_sensor_out.Distance();
-  if (distance < distance_treshold){
+  distance_out = dist_sensor_out.Distance();
+  if (distance_out < distance_treshold){
     if (!previous_state_out && ((current_time - time_counter_minus) > 2000)){
       counter--;
       time_counter_minus = millis();
     }
-    previous_state_in = true;
+    previous_state_out = true;
   }
   else{
-    previous_state_in = false;
+    previous_state_out = false;
   }
 
   dt = clock.getDateTime();
