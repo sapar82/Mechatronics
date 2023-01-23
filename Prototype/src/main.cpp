@@ -211,14 +211,14 @@ void call_sensor(){
 void setup() {
   Serial.begin(9600);
   Serial.println("Starting...");
-  clock.begin();
-  dht.begin();
+  clock.begin(); // initialize clock
+  dht.begin(); // initialize temp and humidity sensor
   clock.setDateTime(__DATE__, __TIME__);    // Set the RTC to the compile time
   Serial.print("Time: ");
   Serial.println(__TIME__);
-  initialization_sd();
+  initialization_sd(); // initialize SD card reader
   delay(200);
-  init_screen();
+  init_screen(); // initialize screen
   Serial.print("Setup completed");
 }
 
