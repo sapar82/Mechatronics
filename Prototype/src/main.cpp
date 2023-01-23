@@ -176,21 +176,7 @@ void loop_screen(String time, String counter, String temperature, String humidit
   // delay(300);
 }
 
-void setup() {
-  Serial.begin(9600);
-  Serial.println("Starting...");
-  clock.begin();
-  dht.begin();
-  clock.setDateTime(__DATE__, __TIME__);    // Set the RTC to the compile time
-  Serial.print("Time: ");
-  Serial.println(__TIME__);
-  initialization_sd();
-  delay(200);
-  init_screen();
-  Serial.print("Setup completed");
-}
-
-void loop() {
+void call_sensor(){
     distance_in = dist_sensor_in.Distance();
   if (distance_in < distance_treshold){
   if (!previous_state_in){
@@ -220,6 +206,25 @@ void loop() {
   Serial.print("Distance sensor out: ");
   Serial.print(distance_out);
   Serial.print("\n");
+}
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("Starting...");
+  clock.begin();
+  dht.begin();
+  clock.setDateTime(__DATE__, __TIME__);    // Set the RTC to the compile time
+  Serial.print("Time: ");
+  Serial.println(__TIME__);
+  initialization_sd();
+  delay(200);
+  init_screen();
+  Serial.print("Setup completed");
+}
+
+void loop() {
+  
+  call_sensor();
 
   dt = clock.getDateTime();
   if ( dt.second % 315 == 0 )
