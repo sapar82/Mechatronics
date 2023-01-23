@@ -20,13 +20,12 @@ int TRIG_PIN_2 = 3;
 int ECHO_PIN_2 = 4;
 SR04 dist_sensor_out = SR04(ECHO_PIN_2,TRIG_PIN_2);
 
-int distance;
+int distance_in;
+int distance_out;
 int counter = 0;
 bool previous_state_in = false;
 bool previous_state_out = false;
 const int distance_treshold = 30;
-unsigned long time_counter_plus;
-unsigned long time_counter_minus;
 
 // Display
 #include <epd2in9_V2.h>
