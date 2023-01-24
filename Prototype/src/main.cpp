@@ -24,7 +24,7 @@ int distance_out; // distance measured by sensor 2
 int counter = 0; // number of people inside 
 bool previous_state_in = false;
 bool previous_state_out = false;
-const int distance_treshold = 30; // decision threshold 
+const int distance_treshold = 150; // decision threshold 
 
 // Display
 #include <epd2in9_V2.h>
@@ -228,26 +228,29 @@ void loop() {
   call_sensor(); // ultrasound sensors measurements
 
   dt = clock.getDateTime(); // get data from clock module
+  
+  // Get time
+  time = String(dt.hour/10) + String(dt.hour % 10) + String(":") + String(dt.minute / 10) + String(dt.minute % 10 )+ String(":") + String(dt.second / 10) + String(dt.second % 10);
+  date = String(dt.day) + String("/") + String(dt.month);
+  
+  // Get temperature and humidity
+  humidity = dht.readHumidity(true);
+  
+  //read temperature in Fahrenheit
+  temperature = dht.readTemperature(true);
+  
+  // string for person counter
+  String counter_string = String(counter/1000) + String(counter/100 % 10) + String(counter/10 % 10) + String(counter % 10);
+  loop_screen(String(time), String(counter), String(temperature), String(humidity)); // update screen with current values
+  
   if ( dt.second % 315 == 0 ) // every 5 min 
   {
     Serial.println("Reading sensor");
-    // Get time
-    time = String(dt.hour/10) + String(dt.hour % 10) + String(":") + String(dt.minute / 10) + String(dt.minute % 10 )+ String(":") + String(dt.second / 10) + String(dt.second % 10);
-    date = String(dt.day) + String("/") + String(dt.month);
-
-    // Get temperature and humidity
-    humidity = dht.readHumidity(true);
-    //read temperature in Fahrenheit
-    temperature = dht.readTemperature(true);
-
     // Write to SD card
     Serial.println("Writing to SD card");
     write_data(date, time, temperature, humidity, counter);
     Serial.println("Data written to file:");
     Serial.println(date + String(",") + time + String(",") + String(temperature) + String(",") + String(humidity) + String(",") + String(counter));
   }
-  // string for person counter
-  String counter_string = String(counter/1000) + String(counter/100 % 10) + String(counter/10 % 10) + String(counter % 10);
-    loop_screen(String(time), String(counter), String(temperature), String(humidity)); // update screen with current values
-  delay(1000); // idk if we need this
+  delay(10); // small delay
 }
